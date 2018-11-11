@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./bootstrap/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+    <title>Document</title>
+    <script src="vue.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">info</h3>
+            </div>
+            <div class="panel-body">
+                <label for="">
+                    id:
+                    <input type="text" v-model="id" v-hh="'skyblue'">
+                </label>
+                <label for="">
+                    name:
+                    <input type="text" v-model="name" @keyup.Control="add" v-color="'red'">
+                </label>
+                <input type="button" class="btn btn-primary" @click="add" value="添加" >
+                <label for="">
+                    关键字:
+                    <input type="text" v-model="keyword">
+                </label>
+            </div>
+        </div>
+        <table class="table table-bordered table-hover table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>ctime</th>
+                    <th>option</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="item in search(keyword)" :key="item.id">
+                    <td>{{item.id}}</td>
+                    <td>{{item.name}}</td>
+                    <td>{{item.ctime|Time()}}</td>
+                    <td>
+                        <a href="#" @click.prevent="del(item.id)">删除</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="box">
+        {{msg|deta}}
+    </div>
+    <script>
+        // 全局自定义指令
+        Vue.directive("color",{
+            bind(el,bingding){
+                el.style.color = bingding.value
+            }
+        })
+        // 全局过滤器
+        Vue.filter("Time", function (msg, he = "") {
+            var dt = new Date()
+            var y = dt.getFullYear()
+            var m = dt.getMonth() + 1
+            var d = dt.getDate()
+            if (he.toLowerCase() === "YYYY-mm-dd") {
+                return `${y}-${m}-${d}`
+            } else {
+                var hh = dt.getHours()
+                var mm = dt.getMinutes()
+                var ss = dt.getSeconds()
+                return `${y}-${m}-${d} ${hh}:${mm}:${ss}`
+            }
+        })
+        // 自定义键盘修饰符
+        Vue.config.keyCodes.Control = 17
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                id: "",
+                name: '',
+                keyword: '',
+                list: [
+                    { id: 1, name: '山河故人', ctime: new Date() },
+                    { id: 2, name: '那人那山那狗', ctime: new Date() }
+                ]
+            },
+            methods: {
+                // 添加
+                add() {
+                    return this.list.push({ id: this.id, name: this.name, ctime: new Date() })
+                    this.id = this.name = ""
+                },
+                // 删除
+                del(id) {
+                    return this.list.some((item, i) => {
+                        if (item.id == id) {
+                            return this.list.splice(i, 1)
+                        }
+                    })
+                },
+                // 关键字搜索
+                search(keyword) {
+                    return this.list.filter(item => {
+                        if (item.name.includes(keyword)) {
+                            return true
+                        }
+                    })
+                }
+            },
+            // 自定义私有指令
+            directives:{
+                "hh":{
+                    bind(el,he){
+                        el.style.color = he.value
+                    }
+                }
+            }
+        })
+        var vm2 = new Vue({
+            el: "#box",
+            data: {
+                msg: new Date()
+            },
+            methods: {
+
+            },
+            // 私有过滤器
+            filters: {
+                deta (msg, ha = "") {
+                    var ti = new Date()
+                    var y = ti.getFullYear()
+                    var m = (ti.getMonth() + 1).toString().padStart(2, '0')
+                    var d = (ti.getDate()).toString().padStart(2, '0')
+                    if (ha.toLowerCase() === "yyyy-mm-dd") {
+                        return `${y}-${m}-${d}`
+                    } else {
+                        var hh = ti.getHours().toString().padStart(2, '0')
+                        var mm = ti.getMinutes().toString().padStart(2, '0')
+                        var ss = ti.getSeconds().toString().padStart(2, '0')
+                        return `${y}-${m}-${d} ${hh}:${mm}:${ss}`
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
